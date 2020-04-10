@@ -21,6 +21,7 @@ const isCircleBlue = R.propEq(SHAPES.CIRCLE, COLORS.BLUE);
 const isStarRed = R.propEq(SHAPES.STAR, COLORS.RED);
 const isSquareOrange = R.propEq(SHAPES.SQUARE, COLORS.ORANGE);
 const isGreen = (value) => value === COLORS.GREEN;
+const isOrange = (value) => value === COLORS.ORANGE;
 const isRedEqualsBlue = ({ blue, red }) => blue === red;
 const getColors = R.compose(R.countBy(R.identity), R.values);
 
@@ -51,7 +52,7 @@ export const validateFieldN5 = () => false;
 export const validateFieldN6 = () => false;
 
 // 7. Все фигуры оранжевые.
-export const validateFieldN7 = () => false;
+export const validateFieldN7 = R.compose(R.all(isOrange), R.values);
 
 // 8. Не красная и не белая звезда.
 export const validateFieldN8 = () => false;
