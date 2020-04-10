@@ -20,6 +20,7 @@ const COLORS = { RED: "red", ORANGE: "orange", GREEN: "green", BLUE: "blue" };
 const isCircleBlue = R.propEq(SHAPES.CIRCLE, COLORS.BLUE);
 const isStarRed = R.propEq(SHAPES.STAR, COLORS.RED);
 const isSquareOrange = R.propEq(SHAPES.SQUARE, COLORS.ORANGE);
+const isGreen = (value) => value === COLORS.GREEN;
 const isRedEqualsBlue = ({ blue, red }) => blue === red;
 const getColors = R.compose(R.countBy(R.identity), R.values);
 
@@ -56,7 +57,7 @@ export const validateFieldN7 = () => false;
 export const validateFieldN8 = () => false;
 
 // 9. Все фигуры зеленые.
-export const validateFieldN9 = () => false;
+export const validateFieldN9 = R.compose(R.all(isGreen), R.values);
 
 // 10. Треугольник и квадрат одного цвета (не белого)
 export const validateFieldN10 = () => false;
