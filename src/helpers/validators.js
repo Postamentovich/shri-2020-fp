@@ -42,12 +42,9 @@ export const validateFieldN1 = ({ star, square, triangle, circle }) => {
 };
 
 // 2. Как минимум две фигуры зеленые.
-export const validateFieldN2 = (data) => {
-    // console.log(data);
-};
+export const validateFieldN2 = R.compose(R.gte(R.__, 2), R.prop(COLORS.GREEN), getColors);
 
 // 3. Количество красных фигур равно кол-ву синих.
-
 export const validateFieldN3 = R.compose(isRedEqualsBlue, getColors);
 
 // 4. Синий круг, красная звезда, оранжевый квадрат
