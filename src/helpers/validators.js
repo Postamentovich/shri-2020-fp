@@ -16,14 +16,22 @@ import * as R from "ramda";
  */
 
 const SHAPES = { STAR: "star", SQUARE: "square", TRIANGLE: "triangle", CIRCLE: "circle" };
-const COLORS = { RED: "red", ORANGE: "orange", GREEN: "green", BLUE: "blue" };
+const COLORS = { RED: "red", ORANGE: "orange", GREEN: "green", BLUE: "blue", WHITE: "white" };
+
 const isCircleBlue = R.propEq(SHAPES.CIRCLE, COLORS.BLUE);
 const isStarRed = R.propEq(SHAPES.STAR, COLORS.RED);
 const isSquareOrange = R.propEq(SHAPES.SQUARE, COLORS.ORANGE);
 const isGreen = (value) => value === COLORS.GREEN;
 const isOrange = (value) => value === COLORS.ORANGE;
 const isRedEqualsBlue = ({ blue, red }) => blue === red;
+const isNotWhite = (value) => value !== COLORS.WHITE;
+const isNotRed = (value) => value !== COLORS.RED;
 const getColors = R.compose(R.countBy(R.identity), R.values);
+
+const isTriangleAndSquareColorsEqual = R.converge(R.equals, [
+    R.prop(SHAPES.TRIANGLE, R.__),
+    R.prop(SHAPES.SQUARE, R.__),
+]);
 
 // 1. Красная звезда, зеленый квадрат, все остальные белые.
 export const validateFieldN1 = ({ star, square, triangle, circle }) => {
@@ -35,7 +43,7 @@ export const validateFieldN1 = ({ star, square, triangle, circle }) => {
 
 // 2. Как минимум две фигуры зеленые.
 export const validateFieldN2 = (data) => {
-    console.log(data);
+    // console.log(data);
 };
 
 // 3. Количество красных фигур равно кол-ву синих.
@@ -55,10 +63,10 @@ export const validateFieldN6 = () => false;
 export const validateFieldN7 = R.compose(R.all(isOrange), R.values);
 
 // 8. Не красная и не белая звезда.
-export const validateFieldN8 = () => false;
+export const validateFieldN8 = R.compose(R.allPass([isNotWhite, isNotRed]), R.prop(SHAPES.STAR));
 
 // 9. Все фигуры зеленые.
 export const validateFieldN9 = R.compose(R.all(isGreen), R.values);
 
 // 10. Треугольник и квадрат одного цвета (не белого)
-export const validateFieldN10 = () => false;
+export const validateFieldN10 = (value) => R.compose(isTriangleAndSquareColorsEqual);
