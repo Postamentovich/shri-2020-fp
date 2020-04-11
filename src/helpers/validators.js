@@ -46,12 +46,21 @@ const isAllOrange = R.all(isOrange);
 const isAllGreen = R.all(isGreen);
 const isAnyRed = R.compose(R.any(isRed), getValues);
 
+const isLessThanTwo = (value) => value <= 1;
 const getGreenCount = R.prop(COLORS.GREEN);
+const getWhiteCount = R.prop(COLORS.WHITE);
 const isGreaterOrEqualThanTwo = R.gte(R.__, 2);
+const isGreaterOrEqualThanThree = R.gte(R.__, 3);
+const isColorMoreThanThree = R.compose(R.any(isGreaterOrEqualThanThree), R.values, getColors);
 const isGreenCountEqualTwo = R.compose(R.equals(2), getGreenCount, getColors);
+const isWhiteCountLessThanTwo = R.compose(
+    R.anyPass([isLessThanTwo, R.isNil]),
+    getWhiteCount,
+    getColors
+);
 const isTriangleAndSquareColorsEqual = R.converge(R.equals, [
-    R.prop(SHAPES.TRIANGLE, R.__),
-    R.prop(SHAPES.SQUARE, R.__),
+    R.prop(SHAPES.TRIANGLE),
+    R.prop(SHAPES.SQUARE),
 ]);
 
 // 1. Красная звезда, зеленый квадрат, все остальные белые.
@@ -72,7 +81,7 @@ export const validateFieldN3 = R.compose(isRedEqualsBlue, getColors);
 export const validateFieldN4 = R.allPass([isCircleBlue, isStarRed, isSquareOrange]);
 
 // 5. Три фигуры одного любого цвета кроме белого (четыре фигуры одного цвета – это тоже true).
-export const validateFieldN5 = () => false;
+export const validateFieldN5 = R.allPass([isColorMoreThanThree, isWhiteCountLessThanTwo]);
 
 // 6. Две зеленые фигуры (одна из них треугольник), еще одна любая красная.
 export const validateFieldN6 = R.allPass([isTriangleGreen, isGreenCountEqualTwo, isAnyRed]);
