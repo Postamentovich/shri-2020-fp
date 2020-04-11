@@ -1,51 +1,69 @@
+import * as R from "ramda";
 /**
  * @file Домашка по FP ч. 2
- * 
+ *
  * Подсказки:
  * Метод get у инстанса Api – каррированый
  * GET / https://animals.tech/{id}
- * 
+ *
  * GET / https://api.tech/numbers/base
  * params:
  * – number [Int] – число
  * – from [Int] – из какой системы счисления
  * – to [Int] – в какую систему счисления
- * 
+ *
  * Иногда промисы от API будут приходить в состояние rejected, (прямо как и API в реальной жизни)
  * Ответ будет приходить в поле {result}
  */
-import Api from '../tools/api';
+import Api from "../tools/api";
 
 const api = new Api();
 
-/**
- * Я – пример, удали меня
- */
-const wait = time => new Promise(resolve => {
-    setTimeout(resolve, time);
-})
+const processSequence = async ({ value, writeLog, handleSuccess, handleError }) => {
+    const log = R.tap(writeLog);
+    const successLog = (result) => handleSuccess(result);
+    const failedLog = (error) => handleError(error);
+    const isLengthLessThanTen = (a) => a.length < 10;
+    const isLengthMoreThanTwo = (a) => a.length > 2;
+    const isPositive = (a) => Number(a) >= 0;
+    const createErrorMessage = () => handleError("ValidationError");
+    const isValidate = R.allPass([isLengthLessThanTen, isLengthMoreThanTwo, isPositive]);
+    const getParsedInteger = (value) => Number(value).toFixed(1);
+    const getStringLength = (a) => a.length;
+    const getSqrNumber = (a) => a * a;
+    const getRemainderDivision = (a) => a % 3;
 
-const processSequence = ({value, writeLog, handleSuccess, handleError}) => {
-    /**
-     * Я – пример, удали меня
-     */
-    writeLog(value);
+    const fetchAnimals = (id) =>
+        api.get(`https://animals.tech/${id}`, {}).then(({ result }) => {
+            successLog(result);
+        });
 
-    api.get('https://api.tech/numbers/base', {from: 2, to: 10, number: '01011010101'}).then(({result}) => {
-        writeLog(result);
-    });
+    const processNumber = R.pipe(
+        log,
+        getStringLength,
+        log,
+        getSqrNumber,
+        log,
+        getRemainderDivision,
+        log,
+        fetchAnimals
+    );
 
-    wait(2500).then(() => {
-        writeLog('SecondLog')
+    const fetchNumber = (number) =>
+        api
+            .get("https://api.tech/numbers/base", { from: 10, to: 2, number })
+            .then(({ result }) => {
+                processNumber(result);
+            })
+            .catch((e) => {
+                failedLog(e);
+            });
 
-        return wait(1500);
-    }).then(() => {
-        writeLog('ThirdLog');
+    const parseInteger = R.pipe(getParsedInteger, log, fetchNumber);
 
-        return wait(400);
-    }).then(() => {
-        handleSuccess('Done');
-    });
-}
+    const result = R.pipe(log, R.ifElse(isValidate, parseInteger, createErrorMessage));
+
+    return result(value);
+};
 
 export default processSequence;
